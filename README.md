@@ -36,8 +36,11 @@ If this fails on older versions of Python, try updating your `pip` tool first:
 `python splitter.py`
 
 file_sequence: - `/path/to/file`
+
 Length sequence: - length of fragment (e.g 100)
+
 interval: - step (e.g 10)
+
 ---
 
 `blast.py` - compares splitted genome with the selected database and creates two files: `hits.fna` and `no_hits.fna`
