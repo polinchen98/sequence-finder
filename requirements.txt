@@ -1,2 +1,3 @@
-requests==2.24.0
-Bio==0.4.1
+requests
+biopython
+ncbi-genome-download
