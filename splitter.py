@@ -1,8 +1,16 @@
-file_name = input('file_sequence: ')
-file = open(file_name)
+import argparse
+import os
 
-length_sequence = int(input('Length sequence: '))
-interval = int(input('Interval: '))
+parser = argparse.ArgumentParser()
+parser.add_argument('-s', '--sequence', dest='sequence', type=str, help='Path to file with sequence', required=True)
+parser.add_argument('-l', '--length', dest='length', type=int,
+                    help='The length of the fragments into which input sequence will be cut', required=True)
+parser.add_argument('-i', '--interval', dest='interval', type=int,
+                    help='The interval at which the fragments will be cut', required=True)
+parser.add_argument('-o', '--output', dest='output', type=str, default='split_sequence', help='Path to output file')
+args = parser.parse_args()
+
+file = open(args.sequence)
 
 sequence_name = ''
 sequence = ''
@@ -15,7 +23,11 @@ for line in file:
         sequence_name = line
         is_first_line = False
 
-output = open('split_sequence.fna', 'w')
+
+if not os.path.exists(args.output):
+    os.mkdir(args.output)
+
+output = open(args.output + '.fna', 'w')
 
 
 def prepare_sequence_name(name, start_index, length):
@@ -25,10 +37,11 @@ def prepare_sequence_name(name, start_index, length):
     return result_name
 
 
-for i in range(0, len(sequence), interval):
-    prepared_name = prepare_sequence_name(sequence_name, i + 1, length_sequence - 1)
-    if i + length_sequence < len(sequence):
-        output.write(prepared_name + sequence[i:i + length_sequence] + '\n')
+for i in range(0, len(sequence), args.interval):
+    prepared_name = prepare_sequence_name(sequence_name, i + 1, args.length - 1)
+
+    if i + args.length < len(sequence):
+        output.write(prepared_name + sequence[i:i + args.length] + '\n')
     else:
-        output.write(prepared_name + sequence[-length_sequence:])
+        output.write(prepared_name + sequence[-args.length:])
         break

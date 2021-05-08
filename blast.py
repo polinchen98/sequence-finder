@@ -17,7 +17,7 @@ records = SeqIO.to_dict(SeqIO.parse(args.input, args.format))
 
 # Count of sequences in file for blast
 sequences_per_chunk = 1000
-line_per_sequence = int(len(sequence_lines) / len(records))
+line_per_sequence = round(len(sequence_lines) / len(records))
 
 if not os.path.exists(args.output):
     os.mkdir(args.output)
@@ -51,17 +51,22 @@ for i, chunk in enumerate(chunks):
 
     # creates a temporary file for output, which is overwritten each time
     blastn_cline = NcbiblastnCommandline(task='megablast', query=chunk_name, db=args.db,
-                                         outfmt=5, out=chunk_result_file_name, num_threads=4)
+                                         outfmt=5, out=chunk_result_file_name, num_threads=12)
     stdout, stderr = blastn_cline()
 
     # algorithm for finding hits and non-hits from each 1000 sequences
     q_dict = SeqIO.index(chunk_name, 'fasta')
 
     hits = []
+    is_first_iter = True
+
     for record in NCBIXML.parse(open(chunk_result_file_name)):
 
         if record.alignments:
             hits.append(record.query.split()[0])
+
+        if is_first_iter:
+            is_first_iter = False
 
     no_hits = set(q_dict.keys()) - set(hits)
     orphan_records = [q_dict[name] for name in no_hits]
