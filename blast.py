@@ -5,10 +5,13 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--input', dest='input', type=str, help='path to input file', required=True)
-parser.add_argument('--db', dest='db', type=str, help='path to blast database', required=True)
-parser.add_argument('--output', dest='output', type=str, default='blast_result', help='path to output folder')
-parser.add_argument('--format', dest='format', default='fasta', type=str, help='format of input file')
+parser.add_argument('--input', dest='input', type=str, help='Path to input file', required=True)
+parser.add_argument('--db', dest='db', type=str, help='Path to blast database', required=True)
+parser.add_argument('--output', dest='output', type=str, default='blast_result', help='Path to output folder')
+parser.add_argument('--format', dest='format', default='fasta', type=str, help='Format of input file')
+parser.add_argument('--evalue', dest='evalue', default=10, type=int, help='The BLAST E-value is the number of expected hits of similar quality (score) that could be found just by chance. ')
+parser.add_argument('--num_threads', dest='num_threads', type=int, help='Number of threads (CPUs) to use in blast search')
+parser.add_argument('--task', dest='task', type=str, help='Four different tasks are supported: 1) “megablast”, for very similar sequences (e.g, sequencing errors), 2) “dc-megablast”, typically used for inter-species comparisons, 3) “blastn”, the traditional program used for inter-species comparisons, 4) “blastn-short”, optimized for sequences less than 30 nucleotides.')
 args = parser.parse_args()
 
 sequence_file = open(args.input, 'r')
@@ -50,23 +53,21 @@ for i, chunk in enumerate(chunks):
     chunk_file.write(text)
 
     # creates a temporary file for output, which is overwritten each time
-    blastn_cline = NcbiblastnCommandline(task='megablast', query=chunk_name, db=args.db,
-                                         outfmt=5, out=chunk_result_file_name, num_threads=12)
+
+    # выбор BLAST и e-value
+    blastn_cline = NcbiblastnCommandline(task=args.task, query=chunk_name, db=args.db, evalue=args.evalue,
+                                         outfmt=5, out=chunk_result_file_name, num_threads=args.num_threads)
     stdout, stderr = blastn_cline()
 
     # algorithm for finding hits and non-hits from each 1000 sequences
     q_dict = SeqIO.index(chunk_name, 'fasta')
 
     hits = []
-    is_first_iter = True
 
     for record in NCBIXML.parse(open(chunk_result_file_name)):
 
         if record.alignments:
             hits.append(record.query.split()[0])
-
-        if is_first_iter:
-            is_first_iter = False
 
     no_hits = set(q_dict.keys()) - set(hits)
     orphan_records = [q_dict[name] for name in no_hits]
