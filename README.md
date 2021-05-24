@@ -43,7 +43,10 @@ If this fails on older versions of Python, try updating your `pip` tool first:
 
 `blast.py` - compares splitted genome with the selected database and creates two files: `hits.fna` and `no_hits.fna`
 
-`python blast.py --input path/to/input_file.fna --db path/to/blast_database_folder`
+`python blast.py --input path/to/input_file.fna --db path/to/blast_database_folder --evalue 10.0 --num_threads 4 --task blastn`
+
+`--task` - four different tasks are supported: 1) “megablast”, for very similar sequences (e.g, sequencing errors), 2) “dc-megablast”, typically used for inter-species comparisons, 3)
+                        “blastn”, the traditional program used for inter-species comparisons, 4) “blastn-short”, optimized for sequences less than 30 nucleotides.
 
 ---
 
