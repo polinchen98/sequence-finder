@@ -1,6 +1,6 @@
 # Sequence finder
 
-Small fast Python pipeline for searching species-specific regions in bacterial genomes.
+Light and fast Python pipeline for searching species-specific regions in bacterial genomes.
 
 
 ### Requirements
@@ -13,11 +13,11 @@ You need have installed:
 
 Clone repo
 
-`git clone git@github.com:polinchen98/sequence-finder.git`
+`git clone https://github.com/polinchen98/sequence-finder.git`
 
 Install packages
 
-`pip intall -r requirements.txt`
+`pip install -r requirements.txt`
 
 If this fails on older versions of Python, try updating your `pip` tool first:
 
@@ -33,13 +33,11 @@ If this fails on older versions of Python, try updating your `pip` tool first:
 
 `splitter.py` - split sequence with a specified interval and length
 
-`python splitter.py`
+`python splitter.py --sequence path/to/input/file.fna --length 100 --interval 10 --output path/to/output/file`
 
-file_sequence: - `/path/to/file`
+`--length` (-l): length of fragment (e.g 100)
 
-Length sequence: - length of fragment (e.g 100)
-
-interval: - step (e.g 10)
+`--interval` (-i): step (e.g 10)
 
 ---
 
@@ -47,4 +45,8 @@ interval: - step (e.g 10)
 
 `python blast.py --input path/to/input_file.fna --db path/to/blast_database_folder`
 
+---
 
+`find_of_overlapping_seq.py` - make files with overlapping sequences
+
+`python find_of_overlapping_seq.py --input path/to/input_file.fna`
