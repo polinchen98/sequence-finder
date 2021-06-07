@@ -60,6 +60,6 @@ with open(args.input) as handle:
                 file_name = args.output + '/' + 'file_' + str(get_interval_start(current_record.id)) + '_' + str(
                     get_interval_end(current_record.id))
                 file = open(file_name, 'w')
-                file.write(current_record.description + '\n' + str(current_record.seq) + '\n')
+                file.write('>' + current_record.description + '\n' + str(current_record.seq) + '\n')
                 is_end_of_match = False
                 current_record = None
