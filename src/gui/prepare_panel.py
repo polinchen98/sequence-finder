@@ -8,20 +8,23 @@ class PreparePanel(wx.Panel):
         wx.Panel.__init__(self, parent=parent)
         vbox = wx.BoxSizer(wx.VERTICAL)
 
-        staticbox1 = wx.StaticBox(self, wx.ID_ANY, label="Нужно ли скачивать геномы и создавать базу данных?")
-        staticbox2 = wx.StaticBox(self, wx.ID_ANY, label="Нужно ли разрезать геном?")
+        vbox.Add(wx.Size(50, 50))
+        hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+        statictext1 = wx.StaticText(self, wx.ID_ANY, label="Нужно ли скачивать геномы и создавать базу данных?")
+        statictext2 = wx.StaticText(self, wx.ID_ANY, label="Нужно ли разрезать геном?")
 
-        sizer_1 = wx.StaticBoxSizer(staticbox1, wx.HORIZONTAL)
-        sizer_2 = wx.StaticBoxSizer(staticbox2, wx.HORIZONTAL)
+        hbox1.Add(statictext1, flag=wx.ALIGN_CENTER)
+        hbox2.Add(statictext2, flag=wx.ALIGN_CENTER)
 
-        vbox.Add(sizer_1)
-        vbox.Add(sizer_2)
+        vbox.Add(hbox1, flag=wx.ALIGN_CENTER)
+        vbox.Add(hbox2, flag=wx.ALIGN_CENTER)
 
-        btn_yes1 = wx.Button(self, wx.ID_ANY, label="Да", size=(50, 30), pos=(210, 30))
-        btn_yes2 = wx.Button(self, wx.ID_ANY, label="Да", size=(50, 30), pos=(210, 95))
+        btn_yes1 = wx.Button(self, wx.ID_ANY, label="Да", size=(50, 30))
+        btn_yes2 = wx.Button(self, wx.ID_ANY, label="Да", size=(50, 30))
 
-        sizer_1.Add(btn_yes1, flag=wx.ALL, border=8)
-        sizer_2.Add(btn_yes2, flag=wx.ALL, border=8)
+        hbox1.Add(btn_yes1, flag=wx.ALL, border=10)
+        hbox2.Add(btn_yes2, flag=wx.ALL, border=10)
 
         vbox.Add(wx.Size(100, 100))
 
@@ -29,10 +32,10 @@ class PreparePanel(wx.Panel):
         btn_yes2.Bind(wx.EVT_BUTTON, self.OpenSplitterWindow)
 
         # кнопка RUN
-        self.btnRun = wx.Button(self, label='RUN', size=(70, 30))
-        hbox2 = wx.BoxSizer(wx.HORIZONTAL)
-        hbox2.Add(self.btnRun, flag=wx.LEFT, border=10)
-        vbox.Add(hbox2, flag=wx.ALIGN_RIGHT | wx.BOTTOM | wx.RIGHT, border=10)
+        self.btnRun = wx.Button(self, label='To Blast Step')
+        hbox3 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox3.Add(self.btnRun, flag=wx.LEFT, border=10)
+        vbox.Add(hbox3, flag=wx.ALIGN_RIGHT | wx.BOTTOM | wx.RIGHT, border=10)
         self.SetSizer(vbox)
 
     def OpenPrepareWindow(self, event):

@@ -1,13 +1,22 @@
-import multiprocessing
+from enum import Enum
+from multiprocessing import Process, SimpleQueue
 
 import wx
-import threading
+import time
+
 from src.logic import GenomeDownloader
+
+
+class State(Enum):
+    NOT_STARTED = 1
+    PROCESSING = 2
+    ERROR = 3
 
 
 # Окно с программой для закачки геномов
 class PrepareWindow(wx.Frame):
     download_thread = None
+    state = State.NOT_STARTED
 
     def __init__(self, parent):
         super().__init__(parent, title='Downloading and making database', size=(600, 450))
@@ -20,29 +29,34 @@ class PrepareWindow(wx.Frame):
         vbox.Add(self.panel_one, 1, wx.EXPAND)
         self.panel_one.btnRun.Bind(wx.EVT_BUTTON, self.OnRun)
 
-        self.panel_two = LoadingPanel(self)
-        vbox.Add(self.panel_two, 1, wx.EXPAND)
-        self.panel_two.btnStop.Bind(wx.EVT_BUTTON, self.OnStop)
-        self.panel_two.Hide()
+        self.loading_panel = LoadingPanel(self)
+        vbox.Add(self.loading_panel, 1, wx.EXPAND)
+        self.loading_panel.btnStop.Bind(wx.EVT_BUTTON, self.OnStop)
+        self.loading_panel.Hide()
         self.Centre()
 
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
     def OnCloseWindow(self, event):
-        self.download_thread.terminate()
+        # self.download_thread.terminate()
+        if self.state == State.PROCESSING:
+            dial = wx.MessageDialog(None, 'Вы действительно хотите прервать процесс и выйти?', 'Вопрос',
+                                    wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
-        dial = wx.MessageDialog(None, 'Вы действительно хотите выйти?', 'Вопрос',
-                                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+            ret = dial.ShowModal()
 
-        ret = dial.ShowModal()
+            if ret == wx.ID_YES:
+                self.Destroy()
+            else:
+                event.Veto()
 
-        if ret == wx.ID_YES:
+        if self.state == State.NOT_STARTED:
             self.Destroy()
-        else:
-            event.Veto()
 
     def OnRun(self, event):
-        self.panel_two.Show()
+        self.state = State.PROCESSING
+
+        self.loading_panel.Show()
         self.panel_one.Hide()
         self.Layout()
 
@@ -51,21 +65,32 @@ class PrepareWindow(wx.Frame):
         species = self.panel_one.species.GetValue()
         id = self.panel_one.id.GetValue()
 
-        self.download_thread = multiprocessing.Process(
-            target=lambda: GenomeDownloader(self.log, 'download', 'pectobacterium', 'parmentieri', 'CP027260.1'))
+        queue = SimpleQueue()
+
+        self.download_thread = Process(
+            target=GenomeDownloader,
+            args=(queue, 'download', 'pectobacterium', 'parmentieri', 'CP027260.1'))
         self.download_thread.start()
 
+        print(queue.get())
+
+
     def OnStop(self, event):
-        self.download_thread.terminate()
+        self.state = State.NOT_STARTED
 
+        dial = wx.MessageDialog(None, 'Вы действительно хотите прервать процесс?', 'Вопрос',
+                                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+
+        ret = dial.ShowModal()
+
+        if ret == wx.ID_YES:
+            self.download_thread.terminate()
+        else:
+            event.Veto()
         self.panel_one.Show()
-        self.panel_two.Hide()
+        self.loading_panel.Hide()
         self.Layout()
-
-    def log(self, *text):
-        print('self.text', *text)
-
-        self.panel_two.status.SetLabel('" ".join(map(str, text))')
+        # self.download_thread.terminate()
 
 
 class DownloadPanel(wx.Panel):
@@ -128,13 +153,25 @@ class DownloadPanel(wx.Panel):
 
 class LoadingPanel(wx.Panel):
     def __init__(self, parent):
-        wx.Panel.__init__(self, parent=parent)
+        print('Init LoadingPanel')
+        # parent.download_thread.join()
 
+        wx.Panel.__init__(self, parent=parent)
         vbox = wx.BoxSizer(wx.VERTICAL)
+        hstatus = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.status = wx.StaticText(self, -1, 'Process in progress')
+
+        hstatus.Add(self.status)
+        vbox.Add(hstatus, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, border=1)
+
+        hor = wx.BoxSizer(wx.HORIZONTAL)
+        vbox.Add(hor)
+
+        vbox.AddSpacer(50)
+
         self.btnStop = wx.Button(self, label='Stop', size=(70, 30))
         hstop = wx.BoxSizer(wx.HORIZONTAL)
-        hstop.Add(self.btnStop, flag=wx.LEFT)
-        vbox.Add(hstop, flag=wx.ALIGN_RIGHT | wx.BOTTOM | wx.RIGHT, border=10)
+        hstop.Add(self.btnStop, flag=wx.ALL | wx.ALIGN_CENTER, border=10)
+        vbox.Add(hstop, flag=wx.ALL | wx.ALIGN_CENTER, border=10)
         self.SetSizer(vbox)
-
-        self.status = wx.StaticText(self, -1, 'Process in progress', pos=(100, 100))

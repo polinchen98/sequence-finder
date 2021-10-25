@@ -15,4 +15,4 @@ parser.add_argument('-ns', '--negative_strain', dest='negative_strain', type=str
 
 args = parser.parse_args()
 
-GenomeDownloader(args.output, args.genus, args.species, args.id)
+GenomeDownloader(print, args.output, args.genus, args.species, args.id)

@@ -7,8 +7,10 @@ import ncbi_genome_download as ngd
 
 
 class GenomeDownloader:
-    def __init__(self, log, output, genus, species, id):
-        log(output, genus, species, id)
+    def __init__(self, queue, output, genus, species, id):
+        log = queue.put
+        log('Start downloading genomes')
+
         # Make folder for algorithm
         if not os.path.exists(output):
             os.mkdir(output)
@@ -65,7 +67,8 @@ class GenomeDownloader:
         log('Downloading all genomes of others species for target genus')
 
         ncbi_others_output_folder = output + '/' + 'others'
-        ngd.download(section='genbank', genera=','.join(others_list), groups='bacteria', file_formats='fasta', output=ncbi_others_output_folder,
+        ngd.download(section='genbank', genera=','.join(others_list), groups='bacteria', file_formats='fasta',
+                     output=ncbi_others_output_folder,
                      flat_output=True)
 
         log('Unzipping files')

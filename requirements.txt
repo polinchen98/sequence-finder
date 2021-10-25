@@ -1,3 +1,7 @@
-requests
+requests~=2.26.0
 biopython
 ncbi-genome-download
+wxPython~=4.1.1
+Cython
+primer3-py
+

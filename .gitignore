@@ -4,3 +4,9 @@
 /blastn_test_1
 /file_with_primers
 /result_bras_1
+.DS_Store
+.idea
+brasiliense.fna
+/src/test.fna
+/src/test_kek
+__pycache__/

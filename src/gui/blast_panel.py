@@ -20,7 +20,7 @@ class BlastPanel(wx.Panel):
 
         btn_file = wx.Button(self, label='choose file', size=(90, 30))
         hbox1.Add(btn_file, flag=wx.RIGHT, border=8)
-        btn_file.Bind(wx.EVT_BUTTON, self.ChooseFile)
+        btn_file.Bind(wx.EVT_BUTTON, self.choose_file)
 
         self.input = wx.TextCtrl(self)
         hbox1.Add(self.input, proportion=1)
@@ -30,7 +30,7 @@ class BlastPanel(wx.Panel):
         hbox2.Add(st2, flag=wx.RIGHT, border=8)
         btn_file = wx.Button(self, label='choose folder', size=(100, 30))
         hbox2.Add(btn_file, flag=wx.RIGHT, border=8)
-        btn_file.Bind(wx.EVT_BUTTON, self.ChooseFolderDatabase)
+        btn_file.Bind(wx.EVT_BUTTON, self.choose_folder_database)
 
         self.database = wx.TextCtrl(self)
         hbox2.Add(self.database, proportion=1)
@@ -41,7 +41,7 @@ class BlastPanel(wx.Panel):
 
         btn_file = wx.Button(self, label='choose folder', size=(100, 30))
         hbox3.Add(btn_file, flag=wx.RIGHT, border=8)
-        btn_file.Bind(wx.EVT_BUTTON, self.ChooseFolderOutput)
+        btn_file.Bind(wx.EVT_BUTTON, self.choose_folder_output)
 
         self.output = wx.TextCtrl(self)
         hbox3.Add(self.output, proportion=1)
@@ -59,20 +59,24 @@ class BlastPanel(wx.Panel):
         hbox5.Add(self.num_threads, proportion=1)
         vbox.Add(hbox5, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, border=10)
 
-        lblList = ['blastn', 'dc-megablast', 'megablast', 'blastn-short']
+        tasks_list = ['blastn', 'dc-megablast', 'megablast', 'blastn-short']
 
-        self.rbox = wx.RadioBox(self, label='Task', pos=(10, 230), choices=lblList,
+        self.rbox = wx.RadioBox(self, label='Task', pos=(10, 230), choices=tasks_list,
                                 majorDimension=1, style=wx.RA_SPECIFY_ROWS)
 
         vbox.Add(wx.Size(50, 50))
 
         self.btnRun = wx.Button(self, label='RUN', size=(70, 30))
-        hrun = wx.BoxSizer(wx.HORIZONTAL)
-        hrun.Add(self.btnRun, flag=wx.LEFT, border=10)
-        vbox.Add(hrun, flag=wx.ALIGN_RIGHT | wx.BOTTOM | wx.RIGHT, border=10)
-        self.btnRun.Bind(wx.EVT_BUTTON, self.BlastAnalise)
+        h_run = wx.BoxSizer(wx.HORIZONTAL)
+        h_run.Add(self.btnRun, flag=wx.LEFT, border=10)
+        vbox.Add(h_run, flag=wx.ALIGN_RIGHT | wx.BOTTOM | wx.RIGHT, border=10)
 
-    def ChooseFile(self, event):
+        self.btnReturn = wx.Button(self, label='Return')
+        h_return = wx.BoxSizer(wx.HORIZONTAL)
+        h_return.Add(self.btnReturn, flag=wx.LEFT, border=10)
+        vbox.Add(h_return, flag=wx.ALIGN_RIGHT | wx.BOTTOM | wx.LEFT, border=10)
+
+    def choose_file(self, event):
         dlg = wx.FileDialog(
             self, message="Choose a file")
         if dlg.ShowModal() == wx.ID_OK:
@@ -80,15 +84,15 @@ class BlastPanel(wx.Panel):
             self.input.SetValue(str(paths))
         dlg.Destroy()
 
-    def ChooseFolderOutput(self, event):
+    def choose_folder_output(self, event):
         dlg = wx.DirDialog(
-            self, message="Choose a file")
+            self, message="Choose a folder")
         if dlg.ShowModal() == wx.ID_OK:
             paths = dlg.GetPath()
             self.output.SetValue(str(paths))
         dlg.Destroy()
 
-    def ChooseFolderDatabase(self, event):
+    def choose_folder_database(self, event):
         dlg = wx.DirDialog(
             self, message="Choose a file")
         if dlg.ShowModal() == wx.ID_OK:
@@ -96,13 +100,3 @@ class BlastPanel(wx.Panel):
             self.database.SetValue(str(paths))
         dlg.Destroy()
 
-    def BlastAnalise(self, event):
-        input = self.input.GetValue()
-        database = self.database.GetValue()
-        output = self.output.GetValue()
-        evalue = self.evalue.GetValue()
-        num_threads = self.num_threads.GetValue()
-        task = self.rbox.GetStringSelection()
-        format = 'fasta'
-
-        Blast(input, database, output, format, evalue, num_threads, task)
