@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "S3Finder"
+version = "0.1.7"
+description = "Light and fast Python pipeline for searching species-specific regions in bacterial genomes"
+authors = ["Polina Rasskazova <rasskazova.pm@phystech.edu>"]
+packages = [
+    {include = 'src' },
+]
+
+[tool.poetry.dependencies]
+# src = {path = "src", develop = true}
+python = "^3.8"
+biopython = "^1.79"
+requests = "^2.26.0"
+ncbi-genome-download = "^0.3.1"
+primer3-py = "^0.6.1"
+logic = "^0.2.3"
+wxPython = "^4.1.1"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+blast = "src.blast:run_blast"
+prepare = "src.prepare:make_prepare"
+mapping = "src.mapping:mapping_genome"
+primer = "src.primer_3:make_primers"
+splitter = "src.splitter:make_split_sequence"
+start-gui = "src.run_gui:run_my_app"

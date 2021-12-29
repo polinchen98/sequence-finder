@@ -1,0 +1,8 @@
+/venv
+.DS_Store
+.idea
+brasiliense.fna
+__pycache__/
+studi_gui/
+.venv
+/dist
